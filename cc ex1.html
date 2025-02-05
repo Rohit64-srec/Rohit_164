@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cloud Computing Quiz</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f2f5;
+        }
+        .quiz-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .question {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #e1e4e8;
+            border-radius: 4px;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .option {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .option:hover {
+            background-color: #f5f5f5;
+        }
+        .selected {
+            background-color: #e3f2fd;
+            border-color: #2196f3;
+        }
+        .correct {
+            background-color: #c8e6c9;
+            border-color: #4caf50;
+        }
+        .incorrect {
+            background-color: #ffcdd2;
+            border-color: #f44336;
+        }
+        .button {
+            background-color: #2196f3;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .button:hover {
+            background-color: #1976d2;
+        }
+        .button:disabled {
+            background-color: #bdbdbd;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const questions = [
+            {
+                id: 1,
+                question: "What is cloud computing?",
+                options: [
+                    "A network of remote servers on the internet",
+                    "A local computer network",
+                    "A type of weather forecast",
+                    "A programming language"
+                ],
+                correct: 0
+            },
+            {
+                id: 2,
+                question: "Which of these is NOT a major cloud service provider?",
+                options: [
+                    "Amazon Web Services (AWS)",
+                    "Microsoft Azure",
+                    "Oracle Cloud",
+                    "CloudBook"
+                ],
+                correct: 3
+            },
+            {
+                id: 3,
+                question: "What is IaaS in cloud computing?",
+                options: [
+                    "Internet as a Service",
+                    "Infrastructure as a Service",
+                    "Integration as a Service",
+                    "Installation as a Service"
+                ],
+                correct: 1
+            },
+            {
+                id: 4,
+                question: "Which cloud deployment model provides services to a specific organization?",
+                options: [
+                    "Public Cloud",
+                    "Private Cloud",
+                    "Hybrid Cloud",
+                    "Community Cloud"
+                ],
+                correct: 1
+            },
+            {
+                id: 5,
+                question: "What is the main benefit of cloud scalability?",
+                options: [
+                    "Reduced security risks",
+                    "Lower internet usage",
+                    "Ability to adjust resources based on demand",
+                    "Faster internet speed"
+                ],
+                correct: 2
+            }
+        ];
+
+        function Quiz() {
+            const [currentQuestion, setCurrentQuestion] = React.useState(0);
+            const [selectedOption, setSelectedOption] = React.useState(null);
+            const [score, setScore] = React.useState(0);
+            const [showResult, setShowResult] = React.useState(false);
+            const [submitted, setSubmitted] = React.useState(false);
+
+            const handleOptionClick = (index) => {
+                if (!submitted) {
+                    setSelectedOption(index);
+                }
+            };
+
+            const handleSubmit = () => {
+                if (selectedOption === questions[currentQuestion].correct) {
+                    setScore(score + 1);
+                }
+                setSubmitted(true);
+            };
+
+            const handleNext = () => {
+                if (currentQuestion < questions.length - 1) {
+                    setCurrentQuestion(currentQuestion + 1);
+                    setSelectedOption(null);
+                    setSubmitted(false);
+                } else {
+                    setShowResult(true);
+                }
+            };
+
+            const resetQuiz = () => {
+                setCurrentQuestion(0);
+                setSelectedOption(null);
+                setScore(0);
+                setShowResult(false);
+                setSubmitted(false);
+            };
+
+            const getOptionClassName = (index) => {
+                if (!submitted) return selectedOption === index ? 'option selected' : 'option';
+                if (index === questions[currentQuestion].correct) return 'option correct';
+                if (index === selectedOption) return 'option incorrect';
+                return 'option';
+            };
+
+            if (showResult) {
+                return (
+                    <div className="quiz-container">
+                        <h1>Quiz Complete!</h1>
+                        <div className="result">
+                            <p>Your score: {score} out of {questions.length}</p>
+                            <p>Percentage: {((score / questions.length) * 100).toFixed(1)}%</p>
+                            <button className="button" onClick={resetQuiz}>Retry Quiz</button>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="quiz-container">
+                    <h1>Cloud Computing Quiz</h1>
+                    <div className="question">
+                        <h3>Question {currentQuestion + 1} of {questions.length}</h3>
+                        <p>{questions[currentQuestion].question}</p>
+                        <div className="options">
+                            {questions[currentQuestion].options.map((option, index) => (
+                                <div
+                                    key={index}
+                                    className={getOptionClassName(index)}
+                                    onClick={() => handleOptionClick(index)}
+                                >
+                                    {option}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <button
+                        className="button"
+                        onClick={submitted ? handleNext : handleSubmit}
+                        disabled={selectedOption === null}
+                    >
+                        {submitted ? currentQuestion === questions.length - 1 ? "Show Results" : "Next Question" : "Submit"}
+                    </button>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<Quiz />, document.getElementById('root'));
+    </script>
+</body>
+</html>
